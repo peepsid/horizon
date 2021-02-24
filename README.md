@@ -1,10 +1,10 @@
 <div style="text-align: center">
-  <img title="Morpheos Logo" src="logo.png" width="100%" style="max-width: 720px"/>
+  <img title="Horizon Logo" src="logo.png" width="100%" style="max-width: 720px"/>
 </div>
 
-# Morpheos
+# Horizon
 
-This library allows you to use any version of `eosjs` indistinctly.
+This library allows you to use any version of `arisensdk` indistinctly.
 
 It also contains some useful features for combining actions and transactions together
 and using different authorization formats.
@@ -12,28 +12,28 @@ and using different authorization formats.
 ## Installation
 
 ```sh
-npm install morpheos
+npm install @peepsid/horizon
 ```
 
-You will also need `eosjs`:
+You will also need `arisensdk`:
 
 ```sh
-npm install eosjs
+npm install arisensdk
 # or
-npm install eosjs@16.0.9
+npm install arisensdk@16.0.9
 ```
 
 ## Usage
 
-First, construct your `eosjs` instance.
+First, construct your `arisensdk` instance.
 
 Version <= 16.0.9
 
 ```js
-import * as Eos from 'eosjs'
+import * as Rix from 'arisensdk'
 
-const eos = Eos({
-  httpEndpoint: 'https://api.jungle.alohaeos.com',
+const rix = Rix({
+  httpEndpoint: 'https://greatchains.com',
   keyProvider: 'some-private-key',
   chainId: '038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca'
 });
@@ -42,13 +42,13 @@ const eos = Eos({
 Version >= 20.0.0
 
 ```js
-import { Api, JsonRpc } from 'eosjs'
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
+import { Api, JsonRpc } from 'arisensdk'
+import { JsSignatureProvider } from 'arisensdk/dist/arisensdk-jssig'
 
 const signatureProvider = new JsSignatureProvider(['some-private-key']);
-const rpc = new JsonRpc('https://api.jungle.alohaeos.com', { fetch });
+const rpc = new JsonRpc('https://greatchains.com', { fetch });
 
-const eos = new Api({
+const rix = new Api({
   rpc,
   signatureProvider,
   textEncoder: new TextEncoder(),
@@ -56,18 +56,18 @@ const eos = new Api({
 });
 ```
 
-Then, pass it to the Morpheos constructor:
+Then, pass it to the Horizon constructor:
 
 ```js
-import { Morpheos } from 'morpheos'
+import { Horizon } from '@peepsid/horizon'
 
-const morph = new Morpheos(eos);
+const horizon = new Horizon(eos);
 
 async function useMorph() {
-  await morph.transact(
+  await horizon.transact(
     [
       {
-        account: 'eosio',
+        account: 'arisen',
         name: 'buyram',
         authorization: [{ actor: 'myaccount', permission: 'active' }],
         data: { ... }
@@ -76,18 +76,18 @@ async function useMorph() {
     { broadcast: false, sign: false } // Optional, default true
   );
 
-  await morph.getTableRows({
-    code: 'eosio',
-    scope: 'eosio',
+  await horizon.getTableRows({
+    code: 'arisen',
+    scope: 'arisen',
     table: 'producers'
   }, {
     lower_bound: 'someproducer',
     limit: 10
   });
 
-  await morph.getTableRow({
-    code: 'eosio',
-    scope: 'eosio',
+  await horizon.getTableRow({
+    code: 'arisen',
+    scope: 'arisen',
     table: 'producers',
     primaryKey: 'someproducer'
   });
@@ -96,11 +96,11 @@ async function useMorph() {
 
 ### Transaction class
 
-Morpheos also provides a `Transaction` class to easily combine actions
+Horizon also provides a `Transaction` class to easily combine actions
 and transactions together.
 
 ```js
-import { Transaction } from 'morpheos'
+import { Transaction } from '@peepsid/horizon'
 
 const t1 = new Transaction(someAction);
 const t2 = new Transaction([action1, action2]);
@@ -109,26 +109,26 @@ const t3 = new Transaction([t1, t2, action3]);
 console.log(t3.actions);
 // [someAction, action1, action2, action3]
 
-await morph.transact(t3)
+await horizon.transact(t3)
 ```
 
-Pass a `Morpheos` instance to the `Transaction` constructor to make your
+Pass a `Horizon` instance to the `Transaction` constructor to make your
 transactions easily sendable.
 
 ```js
 function buyRam(account, amount) {
   return new Transaction({
-    account: 'eosio',
+    account: 'arisen',
     name: 'buyram',
     authorization: [{ actor: account, permission: 'active' }],
     data: { payer: account, receiver: account, quant: amount }
-  }, morph);
+  }, horizon);
 }
 
-const transaction = buyRam('myaccount', '1.0000 EOS');
+const transaction = buyRam('myaccount', '1.0000 RIX');
 await transaction.send();
 // or just
-await buyRam('myaccount', '1.0000 EOS').send();
+await buyRam('myaccount', '1.0000 RIX').send();
 
 // Can also provide transact options
 await transaction.send({ broadcast: false, sign: true });
@@ -137,40 +137,40 @@ await transaction.send({ broadcast: false, sign: true });
 Combine transactions easily:
 
 ```js
-function buyRamAndTransferEos(from, to, amount) {
+function buyRamAndTransferRix(from, to, amount) {
   return new Transaction(
     [
       buyRam(from, amount),
       {
-        account: 'eosio.token',
+        account: 'arisen.token',
         name: 'transfer',
         authorization: [{ actor: from, permission: 'active' }],
-        data: { from, to, quantity: amount, memo: 'Morpheos is cool' }
+        data: { from, to, quantity: amount, memo: 'Horizon is cool' }
       }
-    ], morph);
+    ], horizon);
 }
 
-await buyRamAndTransferEos('myaccount', 'youraccount', '1.0000 EOS').send();
+await buyRamAndTransferRix('myaccount', 'youraccount', '1.0000 RIX').send();
 ```
 
 ### FlexAuth
 
-When defining actions (for `morph.transact(...)` or `new Transaction(...)`), Morpheos
+When defining actions (for `horizon.transact(...)` or `new Transaction(...)`), Horizon
 allows you to specify the `authorization` field in multiple formats:
 
 ```js
 const action = {
-  account: 'eosio.token',
+  account: 'arisen.token',
   name: 'transfer',
   authorization: [{ actor: 'myaccount', permission: 'active' }],
-  data: { from: 'myaccount', 'youraccount', '1.0000 EOS', memo: 'Morpheos is awesome' }
+  data: { from: 'myaccount', 'youraccount', '1.0000 RIX', memo: 'Horizon is awesome' }
 };
 
 action.authorization = 'myaccount'; // Defaults to permission: 'active'
 action.authorization = 'myaccount@owner'; // '<actor>@<permission>'
 action.authorization = { actor: 'myaccount', permission: 'active' }; // EOSIO format
-action.authorization = { name: 'myaccount', authority: 'owner' }; // Scatter account format
-action.authorization = { name: 'myaccount' }; // Scatter account format, defaults to permission: 'active'
+action.authorization = { name: 'myaccount', authority: 'owner' }; // PeepsID account format
+action.authorization = { name: 'myaccount' }; // PeepsID account format, defaults to permission: 'active'
 // Can specify multiple authorizations if necessary
 action.authorization = ['myaccount', 'youraccount@owner', { name: 'otheraccount' }];
 ```
@@ -179,7 +179,7 @@ You can also extract the specified account name from any of these
 authorization formats by using:
 
 ```js
-import { Transaction } from 'morpheos'
+import { Transaction } from '@peepsid/horizon'
 
 const accountName = Transaction.extractAccountName(authorization);
 ```
@@ -189,46 +189,46 @@ Which allows you to pass that flexibility to the consumers of your code very eas
 ```js
 function transfer(from, to, amount) {
   return new Transaction({
-    account: 'eosio.token',
+    account: 'arisen.token',
     name: 'transfer',
     authorization: from, // Just provide the FlexAuth here
     data: {
       from: Transaction.extractAccountName(from), // And extract the account name here
       to,
       quantity: amount,
-      memo: 'Morpheos is wonderful'
+      memo: 'Horizon is wonderful'
     }
-  }, morph);
+  }, horizon);
 }
 
 // Then, any of these will work:
-await transfer('myaccount', 'youraccount', '1.0000 EOS').send();
-await transfer('myaccount@owner', 'youraccount', '1.0000 EOS').send();
-await transfer({ actor: 'myaccount', permission: 'active' }, 'youraccount', '1.0000 EOS').send();
-await transfer(scatterAccount, 'youraccount', '1.0000 EOS').send();
+await transfer('myaccount', 'youraccount', '1.0000 RIX').send();
+await transfer('myaccount@owner', 'youraccount', '1.0000 RIX').send();
+await transfer({ actor: 'myaccount', permission: 'active' }, 'youraccount', '1.0000 RIX').send();
+await transfer(peepsidAccount, 'youraccount', '1.0000 RIX').send();
 ```
 
 ### Asset
 
-Morpheos also provides an `Asset` class to manipulate EOSIO assets more easily:
+Horizon also provides an `Asset` class to manipulate EOSIO assets more easily:
 
 ```js
-import { Asset } from 'morpheos'
+import { Asset } from '@peepsid/horizon'
 
-let a = new Asset('42.0000 EOS'); // From string representation
-a = new Asset(42, 'EOS', 4); // From amount, symbol, precision
-a.toString(); // '42.0000 EOS'
+let a = new Asset('42.0000 RIX'); // From string representation
+a = new Asset(42, 'RIX', 4); // From amount, symbol, precision
+a.toString(); // '42.0000 RIX'
 
 // Arithmetic operations
-let b = a.plus(new Asset('30.0000 EOS')); // Does not change `a`, just returns result
-b = a.plus('30.0000 EOS'); // Can also pass the string representation directly
-b = a.minus('500.0000 EOS'); // Also supports negative amounts
+let b = a.plus(new Asset('30.0000 RIX')); // Does not change `a`, just returns result
+b = a.plus('30.0000 RIX'); // Can also pass the string representation directly
+b = a.minus('500.0000 RIX'); // Also supports negative amounts
 b = a.times(4);
 b = a.div(2);
 
 // Comparison operators
 a.equal(b);
-a.equal('9000.0001 EOS'); // Can also pass the string representation directly
+a.equal('9000.0001 RIX'); // Can also pass the string representation directly
 a.greaterThan(b);
 a.gt(b);
 a.lessThan(b);
