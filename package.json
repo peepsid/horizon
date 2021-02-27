@@ -1,16 +1,16 @@
 {
-  "name": "morpheos",
-  "version": "2.3.1",
-  "description": "Use eosjs 1 or 2 indistinctly.",
-  "author": "GetScatter Ltd.",
+  "name": "@peepsid/horizon",
+  "version": "1.0.0",
+  "description": "Use arisensdk or arisensdk-legacy, indistinctly",
+  "author": "PeepsLabs <peepslabs@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GetScatter/morpheos.git"
+    "url": "https://github.com/peepsid/horizon.git"
   },
   "license": "MIT",
   "keywords": [
-    "eosio",
-    "eosjs",
+    "arisen",
+    "arisensdk",
     "compatibility"
   ],
   "files": [
@@ -46,8 +46,8 @@
     "@types/pollyjs__core": "^2.3.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "eosjs": "^20.0.0",
-    "eosjs-legacy": "npm:eosjs@16.0.9",
+    "arisensdk": "^1.0.0",
+    "arisensdk-legacy": "npm:arisenjsv1@1.0.3",
     "husky": "^3.0.0",
     "mocha": "^6.1.4",
     "mocha-typescript": "^1.1.17",
